@@ -1,0 +1,43 @@
+#+TITLE: Static linking to C extensions in Common Lisp
+* Build
+Clone this repo into folder =local-projects= under the Quicklisp installation path.
+For implementations that supports static linking, eval ~(asdf:make :cffi-static-link-example)~ in REPL,
+and you will find the static linked executable named =cffi-static-link-example= under where you clone this repo.
+* Note
+On SBCL, feature ~-:sb-linkable-runtime~ is required for static linking. So you may compile SBCL yourself with this feature enabled.
+1. Download, compile and install SBCL \\
+   #+BEGIN_SRC sh
+     SBCL_VERSION="2.2.11"
+     curl -L "http://downloads.sourceforge.net/project/sbcl/sbcl/$SBCL_VERSION/sbcl-$SBCL_VERSION-source.tar.bz2" -o "sbcl-$SBCL_VERSION-source.tar.bz2"
+     tar -xvjf "sbcl-$SBCL_VERSION-source.tar.bz2"
+     cd "sbcl-$SBCL_VERSION"
+     sh ./make.sh --fancy --with-sb-linkable-runtime --prefix=~/.local/
+     sh ./install.sh
+   #+END_SRC
+2. Enter SBCL library path \\
+   This is mandatory, or SBCL will fail to ~(require "asdf")~. 
+   #+BEGIN_SRC sh
+     cd ~/.local/lib/sbcl/
+     sbcl
+   #+END_SRC
+3. Build the system \\
+   #+BEGIN_EXAMPLE
+     This is SBCL 2.2.11, an implementation of ANSI Common Lisp.
+     More information about SBCL is available at <http://www.sbcl.org/>.
+
+     SBCL is free software, provided as is, with absolutely no warranty.
+     It is mostly in the public domain; some portions are provided under
+     BSD-style licenses.  See the CREDITS and COPYING files in the
+     distribution for more information.
+     ,* (asdf:make :cffi-static-link-example)
+     WARNING: redefining PERFORM (#<STANDARD-CLASS ASDF/BUNDLE:IMAGE-OP> #<STANDARD-CLASS ASDF/SYSTEM:SYSTEM>) in DEFMETHOD
+     ; /home/coco24/.cache/common-lisp/sbcl-2.2.11-linux-x64/home/coco24/.quicklisp/local-projects/cffi-static-link-example/cffi-static-link-example-runtime --core /home/coco24/.local/bin/../lib/sbcl/sbcl.core --noinform --non-interactive --no-sysinit --no-userinit --eval "'(#.(require \"asdf\") #.(in-package :asdf) #.(progn (setf *central-registry* (quote (#P\"/home/coco24/.quicklisp/quicklisp/\"))) (initialize-source-registry (quote nil)) (initialize-output-translations (quote nil)) (upgrade-asdf) (load #P\"/home/coco24/.quicklisp/setup.lisp\") (load-system \"cffi-grovel\") (defmethod operation-done-p ((operation program-op) (system (eql (find-system \"cffi-static-link-example\")))) nil) (defmethod output-files ((operation program-op) (system (eql (find-system \"cffi-static-link-example\")))) (values (list #P\"/home/coco24/.quicklisp/local-projects/cffi-static-link-example/cffi-static-link-example-tmpGHU3ALSV\") t)) (operate (quote program-op) \"cffi-static-link-example\") (quit)))"
+     WARNING: redefining PERFORM (#<STANDARD-CLASS ASDF/BUNDLE:IMAGE-OP> #<STANDARD-CLASS ASDF/SYSTEM:SYSTEM>) in DEFMETHOD
+     compressed 32768 bytes into 463 at level 9
+     compressed 28573696 bytes into 5020018 at level 9
+     compressed 7831552 bytes into 2498614 at level 9
+     compressed 2129920 bytes into 528043 at level 9
+     compressed 13434880 bytes into 3357644 at level 9
+     T
+     ,* 
+   #+END_EXAMPLE
